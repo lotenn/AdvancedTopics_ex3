@@ -12,6 +12,8 @@
 #include <ctime>
 #include "Parser.h"
 
+using namespace std;
+
 #define INVALID_COORD (-1)
 #define INVALID_CHAR '\0'
 #define PRIMARY 0
@@ -138,13 +140,13 @@ public:
     bool canMove();
 };
 
-class AutoPlayerAlgorithm: public PlayerAlgorithm{
+class RSPPlayer_204540710: public PlayerAlgorithm{
 private:
     playerEnum player;
     PossiblePieces knownBoard[N][M][2];
 
 public:
-    AutoPlayerAlgorithm(playerEnum _player): player(_player){resetKnownBoard();}
+    RSPPlayer_204540710();
     void resetKnownBoard();
     void getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill) override;
     void notifyOnInitialBoard(const Board& b, const std::vector<unique_ptr<FightInfo>>& fights) override;

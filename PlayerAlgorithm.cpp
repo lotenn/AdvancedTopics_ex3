@@ -1,4 +1,5 @@
 #include "PlayerAlgorithm.h"
+#include "AlgorithmRegistration.h"
 //******************************************File Algorithm*****************************************************
 
 void FilePlayerAlgorithm::getInitialPositions(int _player, std::vector<unique_ptr<PiecePosition>>& vectorToFill) {
@@ -59,18 +60,26 @@ void FilePlayerAlgorithm::getMoves(){
 }
 
 //*******************************************Auto Algorithm*****************************************************
+extern "C" {
+    RSPPlayer_204540710::RSPPlayer_204540710(){
+        resetKnownBoard();
+    }
+}
+
+REGISTER_ALGORITHM(204540710)
+
 bool PossiblePieces::canMove(){
     return getPossiblePiece() == pROCK || getPossiblePiece() == pSCISSORS || getPossiblePiece() == pPAPER;
 }
 
-void AutoPlayerAlgorithm::resetKnownBoard(){
+void RSPPlayer_204540710::resetKnownBoard(){
     for(int i=0; i<N; i++)
         for(int j=0; j<M; j++)
             for(int k=0; k<2; k++)
                 knownBoard[i][j][k].reset();
 }
 
-void AutoPlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill){
+void RSPPlayer_204540710::getInitialPositions(int player, std::vector<unique_ptr<PiecePosition>>& vectorToFill){
     this->player = intToPlayerEnum(player);
     if(player == 1){
         vectorToFill.push_back(make_unique<PiecePositionImp>(2, 6, 'R', NO_JOKER_CHANGE_SYMBOL));
@@ -178,7 +187,7 @@ void AutoPlayerAlgorithm::getInitialPositions(int player, std::vector<unique_ptr
     }
 }
 
-void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board& b, const std::vector<unique_ptr<FightInfo>>& fights){
+void RSPPlayer_204540710::notifyOnInitialBoard(const Board& b, const std::vector<unique_ptr<FightInfo>>& fights){
     int opponentPlayer_int = playerEnumToInt(getOpposite(this->player));
     int row, col;
 
@@ -223,7 +232,7 @@ void AutoPlayerAlgorithm::notifyOnInitialBoard(const Board& b, const std::vector
     }
 }
 
-void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move& move){
+void RSPPlayer_204540710::notifyOnOpponentMove(const Move& move){
     int fromCol, fromRow, toCol, toRow;
     fromRow = PointUtils::getRow(move.getFrom());
     fromCol = PointUtils::getCol(move.getFrom());
@@ -243,7 +252,7 @@ void AutoPlayerAlgorithm::notifyOnOpponentMove(const Move& move){
     this->knownBoard[fromRow][fromCol][PRIMARY].reset();
 }
 
-void AutoPlayerAlgorithm::notifyFightResult(const FightInfo& fightInfo){
+void RSPPlayer_204540710::notifyFightResult(const FightInfo& fightInfo){
     int thisPlayer, opponentPlayer, col, row;
     thisPlayer = playerEnumToInt(this->player);
     opponentPlayer = playerEnumToInt(getOpposite(this->player));
@@ -283,7 +292,7 @@ void AutoPlayerAlgorithm::notifyFightResult(const FightInfo& fightInfo){
     }
 }
 
-unique_ptr<Move> AutoPlayerAlgorithm::getMove(){
+unique_ptr<Move> RSPPlayer_204540710::getMove(){
     //possible move of all this->player pieces
     int numOfMobilePieces = 0;
     vector<PointImp> possibleTargets[N][M];
@@ -397,7 +406,7 @@ unique_ptr<Move> AutoPlayerAlgorithm::getMove(){
     return move(make_unique<MoveImp>(INVALID_COORD,INVALID_COORD,INVALID_COORD,INVALID_COORD));
 }
 
-void AutoPlayerAlgorithm::performPlayerMove(const PointImp &from, const PointImp &to) {
+void RSPPlayer_204540710::performPlayerMove(const PointImp &from, const PointImp &to) {
     int fromRow = PointUtils::getRow(from), fromCol = PointUtils::getCol(from);
     int targetRow = PointUtils::getRow(to), targetCol = PointUtils::getCol(to);
     int key = knownBoard[targetRow][targetCol][PRIMARY].getPossiblePiece() == pEMPTY ?
@@ -406,7 +415,7 @@ void AutoPlayerAlgorithm::performPlayerMove(const PointImp &from, const PointImp
     knownBoard[fromRow][fromCol][PRIMARY].reset();
 }
 
-void AutoPlayerAlgorithm::getPossibleTargets(const PointImp& point, vector<PointImp>& targetsToFill, bool jokerChange){
+void RSPPlayer_204540710::getPossibleTargets(const PointImp& point, vector<PointImp>& targetsToFill, bool jokerChange){
     int row, col;
     row = PointUtils::getRow(point);
     col = PointUtils::getCol(point);
@@ -437,7 +446,8 @@ void AutoPlayerAlgorithm::getPossibleTargets(const PointImp& point, vector<Point
     }
 }
 
-bool AutoPlayerAlgorithm::canCapture(possiblePieceType _playerPiece, possiblePieceType _opponentPiece){
+
+bool RSPPlayer_204540710::canCapture(possiblePieceType _playerPiece, possiblePieceType _opponentPiece){
     pieceType playerPiece = possiblePieceTypeToPieceType(_playerPiece);
     pieceType opponentPiece = possiblePieceTypeToPieceType(_opponentPiece);
     vector<pieceType> playerWeakerPieces = getKnownWeakerPieces(playerPiece);
@@ -456,7 +466,7 @@ bool AutoPlayerAlgorithm::canCapture(possiblePieceType _playerPiece, possiblePie
     return false;               //opponent piece is not in player's weaker pieces
 }
 
-vector<pieceType> AutoPlayerAlgorithm::getKnownWeakerPieces(pieceType playerPiece) const {
+vector<pieceType> RSPPlayer_204540710::getKnownWeakerPieces(pieceType playerPiece) const {
     switch(playerPiece){
         case SCISSORS:
             return ScissorsPiece(player).getWeakerPieces();
@@ -473,7 +483,7 @@ vector<pieceType> AutoPlayerAlgorithm::getKnownWeakerPieces(pieceType playerPiec
     }
 }
 
-unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange(){
+unique_ptr<JokerChange> RSPPlayer_204540710::getJokerChange(){
     for(int i=0; i<N; i++){
         for(int j=0; j<M; j++){
             PossiblePieces *possibleJokerPiece = &knownBoard[i][j][PRIMARY];
@@ -503,7 +513,7 @@ unique_ptr<JokerChange> AutoPlayerAlgorithm::getJokerChange(){
     return nullptr;
 }
 
-possiblePieceType AutoPlayerAlgorithm::getJokerRepStrongerThan(const possiblePieceType &threatType) const {
+possiblePieceType RSPPlayer_204540710::getJokerRepStrongerThan(const possiblePieceType &threatType) const {
      switch(threatType){
          case pPAPER:
              return pSCISSORS;
@@ -515,3 +525,4 @@ possiblePieceType AutoPlayerAlgorithm::getJokerRepStrongerThan(const possiblePie
              return pEMPTY;
      }
 }
+
