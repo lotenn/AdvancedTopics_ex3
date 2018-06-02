@@ -5,8 +5,15 @@
 #include <memory>
 #include <iostream>
 #include <map>
+#include <atomic>
+#include <dlfcn.h>
 #include "GameManager.h"
 using namespace std;
+
+#define BUF_SIZE 1024
+#define PATH_MAX_SIZE 4096
+#define DEFAULT_NUM_OF_THREADS 4
+#define DEFAULT_PATH ""
 
 class TournamentManager {
 private:
@@ -14,7 +21,7 @@ private:
     map<string, std::function<unique_ptr<PlayerAlgorithm>()>> factory;
     map<string, atomic<int>> scores;
     // private ctor
-    TournamentManager() {}
+    TournamentManager() = default;
 
 public:
     static TournamentManager& getTournamentManager() {
@@ -29,6 +36,8 @@ public:
             //todo: error msg
         }
     }
+    bool loadPlayerAlgorithms();
+
     void runTournament() const;
 };
 

@@ -1,4 +1,4 @@
-#include "GameManager.h"
+#include "TournamentManager.h"
 using namespace std;
 
 int main(int argc, char* argv[]) {
