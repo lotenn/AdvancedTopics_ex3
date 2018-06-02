@@ -20,6 +20,7 @@ private:
     static TournamentManager theTournamentManager;
     map<string, std::function<unique_ptr<PlayerAlgorithm>()>> factory;
     map<string, atomic<int>> scores;
+    vector<void *> dlPlayerAlgorithms;
     // private ctor
     TournamentManager() = default;
 

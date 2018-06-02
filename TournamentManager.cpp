@@ -28,19 +28,8 @@ bool TournamentManager::loadPlayerAlgorithms(){
             cerr << dlerror() << endl;
             return false;
         }
+        dlPlayerAlgorithms.push_back(dPlayerAlgorithm);
     }
-
-
-//    list<void *> dl_list; // list to hold handles for dynamic libs
-////    list<void *>::iterator itr;
-////    vector<string> shape_names;  // vector of shape types used to build menu
-////    list<shape *> shape_list;  // list of shape objects we create
-////    list<shape *>::iterator sitr;
-////    map<string, maker_t *, less<string> >::iterator fitr;
-////    // get the names of all the dynamic libs (.so  files) in the current dir
-        // add the handle to our list
-////        dl_list.insert(dl_list.end(), dlib);
-
     return true;
 }
 
