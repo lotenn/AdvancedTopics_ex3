@@ -15,13 +15,9 @@ string getWinnerString(playerEnum player){
 
 //********************************************************************************************
 
-GameManager::GameManager(playerMode player1Mode, playerMode player2Mode){
-    //creating the players
-    if(player1Mode == FILE_PLAYER) {this->player1 = make_unique<FilePlayerAlgorithm>(PLAYER_1);}
-    else{this->player1 = make_unique<RSPPlayer_204540710>();}
-
-    if(player2Mode == FILE_PLAYER){this->player2 = make_unique<FilePlayerAlgorithm>(PLAYER_2);}
-    else{this->player2 = make_unique<RSPPlayer_204540710>();}
+GameManager::GameManager(unique_ptr<PlayerAlgorithm> _player1, unique_ptr<PlayerAlgorithm> _player2){
+    this->player1 = move(_player1);
+    this->player2 = move(_player2);
 
     //creating the game pieces
     int toolIndex = 0;

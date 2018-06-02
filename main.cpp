@@ -14,14 +14,14 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    GameManager gameManager(player1mode, player2mode);
-    gameManager.initGame();
-    gameManager.positioningStage();
-    if(!gameManager.getGameStatus().isGameOn()){
-        gameManager.endGame();
-        return 0;
-    }
-    gameManager.moveStage();
-    gameManager.endGame();
-    return 0;
+//    GameManager gameManager(player1mode, player2mode);
+//    gameManager.initGame();
+//    gameManager.positioningStage();
+//    if(!gameManager.getGameStatus().isGameOn()){
+//        gameManager.endGame();
+//        return 0;
+//    }
+//    gameManager.moveStage();
+//    gameManager.endGame();
+//    return 0;
 }

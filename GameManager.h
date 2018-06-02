@@ -41,7 +41,7 @@ private:
 
 
 public:
-    GameManager(playerMode player1Mode, playerMode player2Mode);
+    GameManager(unique_ptr<PlayerAlgorithm> _player1, unique_ptr<PlayerAlgorithm> _player2);
 
     const GameStatus &getGameStatus() const {
         return gameStatus;

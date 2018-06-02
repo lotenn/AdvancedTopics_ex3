@@ -7,6 +7,8 @@
 #include <map>
 #include <atomic>
 #include <dlfcn.h>
+#include <mutex>
+#include <thread>
 #include "GameManager.h"
 using namespace std;
 
@@ -14,12 +16,16 @@ using namespace std;
 #define PATH_MAX_SIZE 4096
 #define DEFAULT_NUM_OF_THREADS 4
 #define DEFAULT_PATH ""
+#define MAX_GAMES_NUMBER 30
 
 class TournamentManager {
 private:
     static TournamentManager theTournamentManager;
+    mutex tournamentMutex;
     map<string, std::function<unique_ptr<PlayerAlgorithm>()>> factory;
     map<string, atomic<int>> scores;
+    vector<string> IDs;
+    vector<int> gamesPlayed;
     vector<void *> dlPlayerAlgorithms;
     // private ctor
     TournamentManager() = default;
@@ -38,8 +44,10 @@ public:
         }
     }
     bool loadPlayerAlgorithms();
-
+    void runGame();
     void runTournament() const;
+
+    void updateScores(string &player1_id, string &player2_id, GameManager &gameManager);
 };
 
 
