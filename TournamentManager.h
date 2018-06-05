@@ -7,6 +7,7 @@
 #include <map>
 #include <atomic>
 #include <dlfcn.h>
+#include <string>
 #include <mutex>
 #include <thread>
 #include "GameManager.h"

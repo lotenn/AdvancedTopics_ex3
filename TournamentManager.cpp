@@ -112,9 +112,6 @@ void TournamentManager::updateScores(string &player1_id, string &player2_id, Gam
     }
 }
 
-
-
-
 void TournamentManager::runTournament(){
     if(!theTournamentManager.loadPlayerAlgorithms()){
         cout << "Error: dll load failed" << endl;
@@ -133,8 +130,6 @@ void TournamentManager::runTournament(){
 
 }
 
-
-
 void TournamentManager::closePAdll(){
     for(int i=0; i<(int)dlPlayerAlgorithms.size(); i++)
         dlclose(dlPlayerAlgorithms[i]);
@@ -148,22 +143,16 @@ void TournamentManager::setPath(char *path) {
     TournamentManager::path = path;
 }
 
-//todo: take off
-bool foo(){return true;}
-
 void TournamentManager::printTournamentResults(){
-    auto cmp = [](std::pair<string,int> const & a, std::pair<string,int> const & b)
-    {
+    auto cmp = [](std::pair<string,int> const & a, std::pair<string,int> const & b) {
         return a.second != b.second?  a.second < b.second : a.first < b.first;
     };
-    std::sort(scores.begin(), scores.end(), cmp);
-
-
-
-
-
-    for(auto iter = scores.rbegin(); iter!=scores.rend(); iter++){
+    vector<std::pair<string,int>> pairs;
+    for(auto iter = scores.begin(); iter!=scores.end(); iter++){
+        pairs.push_back(*iter);
+    }
+    std::sort(pairs.begin(), pairs.end(), cmp);
+    for(auto iter = pairs.rbegin(); iter!=pairs.rend(); iter++){
         cout << iter->first << " " << iter->second << endl;
     }
-
  }
