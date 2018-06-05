@@ -24,11 +24,12 @@ private:
     mutex tournamentMutex;
     map<string, std::function<unique_ptr<PlayerAlgorithm>()>> factory;
     map<string, atomic<int>> scores;
-    vector<string> IDs;
-    vector<int> gamesPlayed;
+    map<string, int> gamesPlayed;
     vector<void *> dlPlayerAlgorithms;
+    int numOfthreads;
+    const char *path;
     // private ctor
-    TournamentManager() = default;
+    TournamentManager():numOfthreads(DEFAULT_NUM_OF_THREADS), path(DEFAULT_PATH){};
 
 public:
     static TournamentManager& getTournamentManager() {
@@ -44,10 +45,13 @@ public:
         }
     }
     bool loadPlayerAlgorithms();
-    void runGame();
-    void runTournament() const;
-
-    void updateScores(string &player1_id, string &player2_id, GameManager &gameManager);
+    static void runGame();
+    void runTournament();
+    void updateScores(string &player1_id, string &player2_id, GameManager &gameManager, bool updatePlayer2);
+    void closePAdll();
+    void setNumOfthreads(int numOfthreads);
+    void setPath(char *path);
+    void printTournamentResults();
 };
 
 

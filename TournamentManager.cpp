@@ -1,10 +1,7 @@
+#include <algorithm>
 #include "TournamentManager.h"
 
-const char *path = DEFAULT_PATH;
-int numOfThreads = DEFAULT_NUM_OF_THREADS;
-
 TournamentManager TournamentManager::theTournamentManager;
-int currentUndonePlayer = 0;
 
 bool TournamentManager::loadPlayerAlgorithms(){
     //todo: check if there were no so files
@@ -13,11 +10,8 @@ bool TournamentManager::loadPlayerAlgorithms(){
     char command_str[PATH_MAX_SIZE + strlen("ls *.so")];
     sprintf(command_str, "ls %s*.so", path);  // command string to get dynamic lib names
     dl = popen(command_str, "r");
-    if(!dl){
-        //todo: maybe take off
-        perror("popen error");
+    if(!dl)
         return false;
-    }
     void *dPlayerAlgorithm;
     char in_buf[BUF_SIZE]; // input buffer for playerAlgorithm names
     char playerAlgorithmName[1024];
@@ -28,11 +22,9 @@ bool TournamentManager::loadPlayerAlgorithms(){
         // append ./ to the front of the lib playerAlgorithmName
         sprintf(playerAlgorithmName, "./%s", in_buf);
         dPlayerAlgorithm = dlopen(playerAlgorithmName, RTLD_NOW);
-        if (dPlayerAlgorithm == NULL) {
-            //todo: maybe take off
-            cerr << dlerror() << endl;
+        if (dPlayerAlgorithm == NULL)
             return false;
-        }
+
         char *playerId;
         const char delim[] = " ._";
 
@@ -43,8 +35,7 @@ bool TournamentManager::loadPlayerAlgorithms(){
         if(factory.find(playerId) == factory.end()){
           cout << "Player Algorithm: " << playerAlgorithmName << " was not registered" << endl;
         }
-        IDs.push_back(playerId);
-        gamesPlayed.push_back(0);
+        gamesPlayed[playerId] = 0;
         dlPlayerAlgorithms.push_back(dPlayerAlgorithm);
     }
     return true;
@@ -53,46 +44,126 @@ bool TournamentManager::loadPlayerAlgorithms(){
 /*
  * thread function
  */
-void TournamentManager::runGame(){
-
+ void TournamentManager::runGame(){
     while(true) {
-        tournamentMutex.lock();
-        while(currentUndonePlayer < (int)IDs.size() && gamesPlayed[currentUndonePlayer] >= MAX_GAMES_NUMBER)
-            currentUndonePlayer++;
-        if(currentUndonePlayer >= (int)IDs.size()){break;}
-        string player1_id = IDs[currentUndonePlayer];
+        theTournamentManager.tournamentMutex.lock();
+        auto mapIter = theTournamentManager.gamesPlayed.begin();
+        for(; mapIter->second >= MAX_GAMES_NUMBER &&
+              mapIter!=theTournamentManager.gamesPlayed.end(); mapIter++);
+        if(mapIter == theTournamentManager.gamesPlayed.end()){break;}
+
+        string player1_id = mapIter->first;
+        theTournamentManager.gamesPlayed[player1_id]++;
+
         string player2_id;
 
+        vector<string> finishedIDs;
+        vector<string> unFinishedIDs;
 
-        tournamentMutex.unlock();
-        GameManager gameManager(factory[player1_id](), factory[player2_id]());
+        mapIter = theTournamentManager.gamesPlayed.begin();
+        for(;mapIter != theTournamentManager.gamesPlayed.end(); mapIter++){
+            if(player1_id == mapIter->first)
+                continue;
+            if(mapIter->second >= MAX_GAMES_NUMBER)
+                finishedIDs.push_back(mapIter->first);
+            else
+                unFinishedIDs.push_back(mapIter->first);
+        }
+        std::srand(std::time(nullptr));
+        int unfinished_size = unFinishedIDs.size();
+        bool player2NotFinished = unfinished_size > 0;
+        if(player2NotFinished){
+            int player2_ID_index = rand()%unfinished_size;
+            player2_id = unFinishedIDs[player2_ID_index];
+            theTournamentManager.gamesPlayed[player2_id]++;
+        }
+        else{
+            int player2_ID_index = rand() % finishedIDs.size();
+            player2_id = finishedIDs[player2_ID_index];
+        }
+        theTournamentManager.tournamentMutex.unlock();
+
+        GameManager gameManager(theTournamentManager.factory[player1_id](), theTournamentManager.factory[player2_id]());
         gameManager.initGame();
         gameManager.positioningStage();
         if (!gameManager.getGameStatus().isGameOn()) {
-            updateScores(player1_id, player2_id, gameManager);
+            theTournamentManager.updateScores(player1_id, player2_id, gameManager, player2NotFinished);
         }
         gameManager.moveStage();
-        updateScores(player1_id, player2_id, gameManager);
+        theTournamentManager.updateScores(player1_id, player2_id, gameManager, player2NotFinished);
     }
 }
 
-void TournamentManager::updateScores(string &player1_id, string &player2_id, GameManager &gameManager) {
+void TournamentManager::updateScores(string &player1_id, string &player2_id, GameManager &gameManager, bool updatePlayer2) {
     playerEnum winner = gameManager.getGameStatus().getWinner();
     switch(winner){
         case PLAYER_1:
             scores[player1_id]+=3;
             break;
         case PLAYER_2:
-            scores[player2_id]+=3;
+            if(updatePlayer2)
+                scores[player2_id]+=3;
             break;
         default:
             scores[player1_id]++;
-            scores[player2_id]++;
+            if(updatePlayer2)
+                scores[player2_id]++;
             break;
     }
 }
 
 
-void TournamentManager::runTournament() const{
+
+
+void TournamentManager::runTournament(){
+    if(!theTournamentManager.loadPlayerAlgorithms()){
+        cout << "Error: dll load failed" << endl;
+        return;
+    }
+    int actual_thread_num = std::min(((int)dlPlayerAlgorithms.size()-1)*MAX_GAMES_NUMBER, numOfthreads);
+    vector<thread> gameThreads;
+    for(int i=0; i<actual_thread_num; i++){
+        gameThreads.push_back(thread(runGame));
+    }
+    for(int i=0; i<(int)gameThreads.size(); i++){
+        gameThreads[i].join();
+    }
+    printTournamentResults();
+    closePAdll();
 
 }
+
+
+
+void TournamentManager::closePAdll(){
+    for(int i=0; i<(int)dlPlayerAlgorithms.size(); i++)
+        dlclose(dlPlayerAlgorithms[i]);
+}
+
+void TournamentManager::setNumOfthreads(int numOfthreads) {
+    TournamentManager::numOfthreads = numOfthreads;
+}
+
+void TournamentManager::setPath(char *path) {
+    TournamentManager::path = path;
+}
+
+//todo: take off
+bool foo(){return true;}
+
+void TournamentManager::printTournamentResults(){
+    auto cmp = [](std::pair<string,int> const & a, std::pair<string,int> const & b)
+    {
+        return a.second != b.second?  a.second < b.second : a.first < b.first;
+    };
+    std::sort(scores.begin(), scores.end(), cmp);
+
+
+
+
+
+    for(auto iter = scores.rbegin(); iter!=scores.rend(); iter++){
+        cout << iter->first << " " << iter->second << endl;
+    }
+
+ }
