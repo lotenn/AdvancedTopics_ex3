@@ -16,7 +16,7 @@ using namespace std;
 #define BUF_SIZE 1024
 #define PATH_MAX_SIZE 4096
 #define DEFAULT_NUM_OF_THREADS 4
-#define DEFAULT_PATH ""
+#define DEFAULT_PATH "./"
 #define MAX_GAMES_NUMBER 30
 
 class TournamentManager {

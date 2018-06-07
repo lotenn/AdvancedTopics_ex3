@@ -3,8 +3,8 @@
 
 using namespace std;
 
+//int main(){
 int main(int argc, char* argv[]) {
-
     if(!(argc == 1 || argc == 3 || argc == 5)){
         cout << "Invalid number of command line arguments" << endl;
         return 0;
