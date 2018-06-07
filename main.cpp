@@ -28,6 +28,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-
+    TournamentManager::getTournamentManager().runTournament();
     return 0;
 }
