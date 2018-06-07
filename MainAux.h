@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <climits>
 
+using namespace std;
+
 enum parsingArgsResult {
     PARSE_THREAD,
     PARSE_PATH,
