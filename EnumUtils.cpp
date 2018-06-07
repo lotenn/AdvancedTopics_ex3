@@ -1,7 +1,3 @@
-//
-// Created by loten on 12/05/2018.
-//
-
 #include "EnumUtils.h"
 
 
@@ -28,14 +24,6 @@ playerEnum getOpposite(playerEnum player){
     }
 }
 
-string playerEnumToString(playerEnum player){
-    map<playerEnum , string> strings;
-    strings[PLAYER_1] = "player 1";
-    strings[PLAYER_2] = "player 2";
-    strings[NO_PLAYER] = "no player";
-    auto str = strings.find(player);
-    return str != strings.end() ? str->second : "";
-}
 
 playerEnum intToPlayerEnum(int player){
     switch(player){

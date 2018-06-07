@@ -1,18 +1,5 @@
 #include "GameManager.h"
 
-
-
-
-string getWinnerString(playerEnum player){
-    map<playerEnum , string> winner;
-    winner[PLAYER_1] = "1";
-    winner[PLAYER_2] = "2";
-    winner[NO_PLAYER] = "0";
-    auto str = winner.find(player);
-    return str != winner.end() ? str->second : "";
-}
-
-
 //********************************************************************************************
 
 GameManager::GameManager(unique_ptr<PlayerAlgorithm> _player1, unique_ptr<PlayerAlgorithm> _player2){
@@ -213,7 +200,6 @@ void GameManager::validatePositioningVector(playerEnum player, vector<unique_ptr
 }
 
 void GameManager::initGame(){
-    player1Score = player2Score = 0;
     currentPlayer = PLAYER_1;
     gameStatus.reset();
     board.clearBoard();
@@ -499,133 +485,3 @@ void GameManager::moveStage(){
     gameStatus.setLoser(NO_PLAYER);
 }
 
-void GameManager::raisePlayerScore(int score, playerEnum player){
-    if(player == PLAYER_1) this->player1Score+=score;
-    else if(player == PLAYER_2) this->player2Score+=score;
-}
-
-bool GameManager::badPositioningFile(endGameReason reason){
-    return (reason == BAD_POSITIONING_FILE_INVALID || reason == BAD_POSITIONING_FILE_NOT_ENOUGH_FLAGS ||
-            reason == BAD_POSITIONING_FILE_TOO_MANY_PIECES || reason == BAD_POSITIONING_FILE_DUPLICATE_CELL_POSITION ||
-            reason == DRAW_BAD_POSITIONING_FILE_BOTH_PLAYERS);
-}
-
-bool GameManager::badMovesFile(endGameReason reason){
-    return (reason == BAD_MOVE_FILE_NOT_YOUR_PIECE || reason == BAD_MOVE_FILE_TOOL_CANT_MOVE ||
-            reason == BAD_MOVE_FILE_CELL_OCCUPIED || reason == BAD_MOVE_FILE_NOT_JOKER || reason == BAD_MOVE_FILE_INVALID);
-}
-
-bool GameManager::badInputFile(endGameReason reason){
-    return (badPositioningFile(reason) || badMovesFile(reason));
-}
-
-void GameManager::printBadInputFile(){
-    string errorMessage;
-    string inputType = badPositioningFile(gameStatus.getMainReason()) ? "Positioning" : "Moves";
-    string msgPrefix = "Bad "+ inputType +" input file: ";
-    if(gameStatus.getMainReason() != DRAW_BAD_POSITIONING_FILE_BOTH_PLAYERS) {
-        errorMessage = getBadInputFileMessage(gameStatus.getMainReason());
-        cout << msgPrefix << errorMessage << " - " + playerEnumToString(gameStatus.getLoser()) << endl;
-    }
-    else{
-        errorMessage = getBadInputFileMessage(gameStatus.getReason1());
-        cout << msgPrefix << errorMessage << " - " + playerEnumToString(PLAYER_1) << endl;
-        errorMessage = getBadInputFileMessage(gameStatus.getReason2());
-        cout << msgPrefix << errorMessage << " - " + playerEnumToString(PLAYER_2) << endl;
-    }
-}
-
-string GameManager::getBadInputFileMessage(endGameReason reason){
-    map<endGameReason, string> messages;
-    messages[BAD_POSITIONING_FILE_INVALID] = "invalid line in Positioning input file";
-    messages[BAD_POSITIONING_FILE_NOT_ENOUGH_FLAGS] = "not enough flags in the positioning input file";
-    messages[BAD_POSITIONING_FILE_TOO_MANY_PIECES] = "too many pieces in positioning input file";
-    messages[BAD_POSITIONING_FILE_DUPLICATE_CELL_POSITION] = "2 pieces located in the same cell in the positioning input file";
-    messages[BAD_MOVE_FILE_NOT_YOUR_PIECE] = "specified cell does not contain player's piece";
-    messages[BAD_MOVE_FILE_TOOL_CANT_MOVE] = "trying to perform an illegal movement with a piece";
-    messages[BAD_MOVE_FILE_CELL_OCCUPIED] = "target cell already contains player's piece";
-    messages[BAD_MOVE_FILE_NOT_JOKER] = "cannot change piece type. cell does not contain a joker";
-    messages[BAD_MOVE_FILE_INVALID] = "invalid line in Moves input file";
-    auto str = messages.find(reason);
-    return str != messages.end() ? str->second : "";
-}
-
-string GameManager::getReasonString(){
-    map<endGameReason, string> reasons;
-    reasons[NO_MORE_FLAGS] = "All flags of the opponent are captured";
-    reasons[NO_MOVING_PIECES] = "All moving PIECEs of the opponent are eaten";
-    reasons[BAD_POSITIONING_FILE_INVALID] = "Bad Positioning input file for "+ playerEnumToString(gameStatus.getLoser());
-    reasons[BAD_POSITIONING_FILE_NOT_ENOUGH_FLAGS] = "Bad Positioning input file for " + playerEnumToString(gameStatus.getLoser());
-    reasons[BAD_POSITIONING_FILE_TOO_MANY_PIECES] = "Bad Positioning input file for " + playerEnumToString(gameStatus.getLoser());
-    reasons[BAD_POSITIONING_FILE_DUPLICATE_CELL_POSITION] = "Bad Positioning input file for "+ playerEnumToString(gameStatus.getLoser());
-    reasons[BAD_MOVE_FILE_INVALID] = "Bad Moves input file for "+ playerEnumToString(gameStatus.getLoser());
-    reasons[BAD_MOVE_FILE_NOT_YOUR_PIECE] = "Bad Moves input file for " + playerEnumToString(gameStatus.getLoser());
-    reasons[BAD_MOVE_FILE_TOOL_CANT_MOVE] = "Bad Moves input file for " + playerEnumToString(gameStatus.getLoser());
-    reasons[NO_MORE_MOVES] = "No moves for " + playerEnumToString(gameStatus.getLoser());
-    reasons[BAD_MOVE_FILE_CELL_OCCUPIED] = "Bad Moves input file for " + playerEnumToString(gameStatus.getLoser());
-    reasons[BAD_MOVE_FILE_NOT_JOKER] = "Bad Moves input file for "+ playerEnumToString(gameStatus.getLoser());
-    reasons[DRAW_POSITIONING_ENDED_WITH_NO_FLAGS] = "A tie - all flags are eaten by both players in the position files";
-    reasons[DRAW_POSITIONING_ENDED_WITH_NO_MOVING_PIECES] = "A tie - moving PIECEs are eaten by both players in the position files";
-    reasons[DRAW_BAD_POSITIONING_FILE_BOTH_PLAYERS] = "Bad Positioning input file for both players";
-    reasons[DRAW_REACHED_MAX_NUM_OF_TURNS_WITH_NO_FIGHTS] = "Draw. Reached max num of turns with no fights";
-
-
-    auto str = reasons.find(gameStatus.getMainReason());
-    return str != reasons.end() ? str->second : "";
-}
-
-void GameManager::endGame(){
-    if (gameStatus.getMainReason() == NO_POSITIONING_FILE){
-        cout << "No Positioning input file for " << playerEnumToString(gameStatus.getLoser()) << endl;
-        return;
-    }
-    else{
-        raisePlayerScore(1, gameStatus.getWinner());
-        if(badInputFile(gameStatus.getMainReason()))
-            printBadInputFile();
-        string winner, reason, board;
-        winner = getWinnerString(gameStatus.getWinner());
-        reason = getReasonString();
-        board = this->board.boardToString();
-        generateOutputFile("../rps.output", winner, reason, board);
-    }
-}
-
-void GameManager::generateOutputFile(const char *outputFilePath, string winner, string reason, string board){
-    ofstream outputFile;
-    outputFile.open(outputFilePath);
-    if(outputFile.is_open()) {
-        outputFile << "Winner: " << winner << endl;
-        outputFile << "Reason: " << reason << endl;
-        outputFile << endl;
-        outputFile << board << endl;
-        outputFile.close();
-    }
-    else cout<<"Error: Failed to open output file '" << outputFilePath << "'" <<endl;
-}
-
-bool GameManager::parsePlayerModes(char* commandLine, playerMode& player1mode, playerMode& player2mode){
-    if(!commandLine || strlen(commandLine)==0 || strcmp(commandLine, "")==0) {return false;}
-    if(strcmp(commandLine, "auto-vs-file")==0){
-        player1mode = AUTO_PLAYER;
-        player2mode = FILE_PLAYER;
-        return true;
-    }
-    else if(strcmp(commandLine, "file-vs-auto")==0){
-        player1mode = FILE_PLAYER;
-        player2mode = AUTO_PLAYER;
-        return true;
-    }
-    else if(strcmp(commandLine, "auto-vs-auto")==0){
-        player1mode = AUTO_PLAYER;
-        player2mode = AUTO_PLAYER;
-        return true;
-    }
-    else if(strcmp(commandLine, "file-vs-file")==0){
-        player1mode = FILE_PLAYER;
-        player2mode = FILE_PLAYER;
-        return true;
-    }
-    else
-        return false;
-}

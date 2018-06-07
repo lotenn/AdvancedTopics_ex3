@@ -49,7 +49,7 @@ bool TournamentManager::loadPlayerAlgorithms(){
         theTournamentManager.tournamentMutex.lock();
         auto mapIter = theTournamentManager.gamesPlayed.begin();
         for(; mapIter->second >= MAX_GAMES_NUMBER &&
-              mapIter!=theTournamentManager.gamesPlayed.end(); mapIter++);
+              mapIter!= theTournamentManager.gamesPlayed.end(); mapIter++);
         if(mapIter == theTournamentManager.gamesPlayed.end()){break;}
 
         string player1_id = mapIter->first;
@@ -119,15 +119,15 @@ void TournamentManager::runTournament(){
     }
     int actual_thread_num = std::min(((int)dlPlayerAlgorithms.size()-1)*MAX_GAMES_NUMBER, numOfthreads);
     vector<thread> gameThreads;
-    for(int i=0; i<actual_thread_num; i++){
+    for(int i=0; i<actual_thread_num-1; i++){
         gameThreads.push_back(thread(runGame));
     }
+    runGame();
     for(int i=0; i<(int)gameThreads.size(); i++){
         gameThreads[i].join();
     }
     printTournamentResults();
     closePAdll();
-
 }
 
 void TournamentManager::closePAdll(){

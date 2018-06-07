@@ -1,7 +1,3 @@
-//
-// Created by loten on 12/05/2018.
-//
-
 #ifndef ADVANCEDTOPICS2_ENUMUTILS_H
 #define ADVANCEDTOPICS2_ENUMUTILS_H
 
@@ -38,24 +34,10 @@ enum endGameReason{
     DRAW_BAD_POSITIONING_FILE_BOTH_PLAYERS
 };
 
-
-
 int playerEnumToInt(playerEnum player);
 
 playerEnum intToPlayerEnum(int player);
 
 playerEnum getOpposite(playerEnum player);
-
-string playerEnumToString(playerEnum player);
-
-enum playerMode{
-    AUTO_PLAYER = 0,
-    FILE_PLAYER = 1
-};
-
-
-
-
-
 
 #endif //ADVANCEDTOPICS2_ENUMUTILS_H

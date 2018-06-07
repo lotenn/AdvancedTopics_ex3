@@ -18,12 +18,6 @@
 #define NUM_OF_F 1
 #define MAX_TURNS_WITH_NO_FIGHTS 100
 
-
-
-
-
-string getWinnerString(playerEnum player);
-
 //***********************Game Manager*****************************************************
 
 class GameManager {
@@ -33,12 +27,9 @@ private:
     BoardImp board;
     vector<shared_ptr<Piece>> player1Pieces;
     vector<shared_ptr<Piece>> player2Pieces;
-    int player1Score;
-    int player2Score;
     playerEnum currentPlayer;
     FightInfoImp fightInfo;
     GameStatus gameStatus;
-
 
 public:
     GameManager(unique_ptr<PlayerAlgorithm> _player1, unique_ptr<PlayerAlgorithm> _player2);
@@ -69,27 +60,6 @@ public:
 
     void moveStage();
 
-    void raisePlayerScore(int score, playerEnum player);
-
-    bool badPositioningFile(endGameReason reason);
-
-    bool badMovesFile(endGameReason reason);
-
-    bool badInputFile(endGameReason reason);
-
-    string getBadInputFileMessage(endGameReason reason);
-
-    void printBadInputFile();
-
-    string getReasonString();
-
-    void endGame();
-
-    void generateOutputFile(const char *outputFilePath, string winner, string reason, string board);
-
-    static bool parsePlayerModes(char* commandLine, playerMode& player1mode, playerMode& player2mode);
-
-    };
-
+};
 
 #endif //ADVANCEDTOPICS2_GAMEMANAGER_H
