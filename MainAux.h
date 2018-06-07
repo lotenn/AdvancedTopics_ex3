@@ -1,9 +1,9 @@
-//
-// Created by root on 6/5/18.
-//
-
 #ifndef ADVANCEDTOPICS3_MAINAUX_H
 #define ADVANCEDTOPICS3_MAINAUX_H
+
+#include <cstring>
+#include <cstdlib>
+#include <climits>
 
 enum parsingArgsResult {
     PARSE_THREAD,
@@ -11,6 +11,6 @@ enum parsingArgsResult {
     PARSE_FAILED
 };
 
-void parseArguments(char *arg, int *num_of_thread, char *path);
+parsingArgsResult parseArguments(char *arg1, char *arg2, int &num_of_thread, char* &path);
 
 #endif //ADVANCEDTOPICS3_MAINAUX_H
