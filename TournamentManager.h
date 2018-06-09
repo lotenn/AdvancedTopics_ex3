@@ -49,7 +49,7 @@ public:
     static void runGame();
     void runTournament();
     void updateScores(string &player1_id, string &player2_id, GameManager &gameManager, bool updatePlayer2);
-    void closePAdll();
+    void cleanup();
     void setNumOfthreads(int numOfthreads);
     void setPath(char *path);
     void printTournamentResults();

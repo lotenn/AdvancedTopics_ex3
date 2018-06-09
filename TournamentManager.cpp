@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <sstream>
 #include "TournamentManager.h"
 
 TournamentManager TournamentManager::theTournamentManager;
@@ -7,21 +8,29 @@ bool TournamentManager::loadPlayerAlgorithms(){
     //todo: check if there were no so files
 
     FILE *dl;   // handle to read directory
-    char command_str[PATH_MAX_SIZE + strlen("ls *.so")];
-    sprintf(command_str, "ls %s*.so", path);  // command string to get dynamic lib names
-    dl = popen(command_str, "r");
+//    char command_str[PATH_MAX_SIZE + strlen("ls *.so")];
+//    sprintf(command_str, "ls %s/*.so", path);  // command string to get dynamic lib names
+
+    stringstream stream_command_str;
+    stream_command_str << "ls " << path << "/*.so";
+    string command_str = stream_command_str.str();
+
+    dl = popen(command_str.c_str(), "r");
     if(!dl)
         return false;
+
     void *dPlayerAlgorithm;
     char in_buf[BUF_SIZE]; // input buffer for playerAlgorithm names
     char playerAlgorithmName[1024];
     while(fgets(in_buf, BUF_SIZE, dl)) {
+        cout << "inside while loop" << endl;
         // trim off the whitespace
         char *ws = strpbrk(in_buf, " \t\n");
         if (ws) *ws = '\0';
         // append ./ to the front of the lib playerAlgorithmName
         sprintf(playerAlgorithmName, "./%s", in_buf);
         dPlayerAlgorithm = dlopen(playerAlgorithmName, RTLD_NOW);
+
         if (dPlayerAlgorithm == NULL)
             return false;
 
@@ -127,12 +136,13 @@ void TournamentManager::runTournament(){
         gameThreads[i].join();
     }
     printTournamentResults();
-    closePAdll();
+    cleanup();
 }
 
-void TournamentManager::closePAdll(){
-    for(int i=0; i<(int)dlPlayerAlgorithms.size(); i++)
-        dlclose(dlPlayerAlgorithms[i]);
+void TournamentManager::cleanup(){
+     factory.clear();
+     for(int i=0; i<(int)dlPlayerAlgorithms.size(); i++)
+         dlclose(dlPlayerAlgorithms[i]);
 }
 
 void TournamentManager::setNumOfthreads(int numOfthreads) {
