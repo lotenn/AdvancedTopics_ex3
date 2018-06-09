@@ -372,7 +372,12 @@ void GameManager::moveStage(){
 
         //player 1 turn
         currentPlayer = PLAYER_1;
-        //player 1 lost - no more moving pieces
+		
+		//todo:
+        cout << board.boardToString() << endl;
+		cout << "********************" << endl;
+		
+		//player 1 lost - no more moving pieces
         if(!containsMovingPieces(player1Pieces)){
             gameStatus.setGameOff();
             gameStatus.setWinner(PLAYER_2);
@@ -425,7 +430,12 @@ void GameManager::moveStage(){
 
         //player 2 turn
         currentPlayer = PLAYER_2;
-        //player 2 lost - no more moving pieces
+		
+		//todo:
+        cout << board.boardToString() << endl;
+		cout << "********************" << endl;
+        
+		//player 2 lost - no more moving pieces
         if(!containsMovingPieces(player2Pieces)){
             gameStatus.setGameOff();
             gameStatus.setWinner(PLAYER_1);

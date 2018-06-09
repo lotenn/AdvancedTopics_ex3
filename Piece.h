@@ -244,7 +244,7 @@ public:
 
     void removePiece() override {}
 
-    char toChar() const override{return ' ';}
+    char toChar() const override{return '_';}
 };
 
 class JokerPiece : public Piece{

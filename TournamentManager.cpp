@@ -8,7 +8,6 @@ bool TournamentManager::loadPlayerAlgorithms(){
     //todo: check if there were no so files
 
     FILE *dl;   // handle to read directory
-
     stringstream stream_command_str;
     stream_command_str << "ls " << path << "/*.so";
     string command_str = stream_command_str.str();
@@ -78,16 +77,17 @@ bool TournamentManager::loadPlayerAlgorithms(){
                 unFinishedIDs.push_back(mapIter->first);
         }
         std::srand(std::time(nullptr));
-        int unfinished_size = unFinishedIDs.size();
+        int unfinished_size = (int)unFinishedIDs.size();
         bool player2NotFinished = unfinished_size > 0;
         if(player2NotFinished){
-            int player2_ID_index = rand()%unfinished_size;
-            player2_id = unFinishedIDs[player2_ID_index];
+			int player2_ID_index = rand()%unfinished_size;
+		    player2_id = unFinishedIDs[player2_ID_index];
             theTournamentManager.gamesPlayed[player2_id]++;
         }
         else{
-			if((int)finishedIDs.size() != 0){
-				int player2_ID_index = rand() % finishedIDs.size();
+			int finished_size = (int)finishedIDs.size();
+			if(finished_size != 0){
+				int player2_ID_index = rand() % finished_size;
 				player2_id = finishedIDs[player2_ID_index];
 				theTournamentManager.gamesPlayed[player2_id]++;
 			}
@@ -128,6 +128,12 @@ void TournamentManager::runTournament(){
         cout << "Error: dll load failed" << endl;
         return;
     }
+	if((int)factory.size() <= 1){
+		cout << "Not enough players for tournament" << endl;
+		//todo: reutrn cleanup
+		cleanup();
+		return;
+	}
     int actual_thread_num = std::min(((int)dlPlayerAlgorithms.size()-1)*MAX_GAMES_NUMBER, numOfthreads);
     vector<thread> gameThreads;
     for(int i=0; i<actual_thread_num-1; i++){
@@ -138,7 +144,7 @@ void TournamentManager::runTournament(){
         gameThreads[i].join();
     }
     printTournamentResults();
-    //cleanup();
+    cleanup();
 }
 
 void TournamentManager::cleanup(){

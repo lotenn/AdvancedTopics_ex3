@@ -78,6 +78,10 @@ public:
     bool canCapture(possiblePieceType playerPiece, possiblePieceType opponentPiece);
     vector<pieceType> getKnownWeakerPieces(pieceType playerPiece) const;
     possiblePieceType getJokerRepStrongerThan(const possiblePieceType &threatType) const;
+	
+	//todo 
+	void printKnownBoard();
+
 };
 
 

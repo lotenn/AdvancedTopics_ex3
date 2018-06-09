@@ -17,7 +17,8 @@ using namespace std;
 #define PATH_MAX_SIZE 4096
 #define DEFAULT_NUM_OF_THREADS 4
 #define DEFAULT_PATH "./"
-#define MAX_GAMES_NUMBER 30
+//todo: max to 30
+#define MAX_GAMES_NUMBER 100
 
 class TournamentManager {
 private:
