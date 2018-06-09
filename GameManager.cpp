@@ -151,7 +151,7 @@ void GameManager::validatePositioningVector(playerEnum player, vector<unique_ptr
            return;
        }
        //regular command
-       if (piecePositions[i]->getJokerRep() == NO_JOKER_CHANGE_SYMBOL) {
+       if (piecePositions[i]->getPiece() != 'J') {
            switch (piecePositions[i]->getPiece()) {
                case 'R':
                    rockCounter--;
@@ -217,7 +217,7 @@ void GameManager::setPlayerPieces(const vector<unique_ptr<PiecePosition>> &piece
 
     for(int i=0; i < (int)piecePositions.size(); i++){
         bool wasFight = false;
-        if(piecePositions[i]->getJokerRep() == NO_JOKER_CHANGE_SYMBOL){
+        if(piecePositions[i]->getPiece() != 'J'){
             pieceType _pieceType = charToPieceType(piecePositions[i]->getPiece());
             for(shared_ptr<Piece> piece: *(playerPieces)){
                 if(!piece->IsPositioned() && !piece->isJoker() && piece->getType() == _pieceType){
@@ -302,7 +302,6 @@ void GameManager::positioningStage(){
     }
     setPlayerPieces(player1PiecePosition, PLAYER_1, fights);
     setPlayerPieces(player2PiecePosition, PLAYER_2, fights);
-
     positioningCheckGameEnd();
 
     if(gameStatus.isGameOn()){

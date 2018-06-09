@@ -8,8 +8,6 @@ bool TournamentManager::loadPlayerAlgorithms(){
     //todo: check if there were no so files
 
     FILE *dl;   // handle to read directory
-//    char command_str[PATH_MAX_SIZE + strlen("ls *.so")];
-//    sprintf(command_str, "ls %s/*.so", path);  // command string to get dynamic lib names
 
     stringstream stream_command_str;
     stream_command_str << "ls " << path << "/*.so";
@@ -23,12 +21,11 @@ bool TournamentManager::loadPlayerAlgorithms(){
     char in_buf[BUF_SIZE]; // input buffer for playerAlgorithm names
     char playerAlgorithmName[1024];
     while(fgets(in_buf, BUF_SIZE, dl)) {
-        cout << "inside while loop" << endl;
         // trim off the whitespace
         char *ws = strpbrk(in_buf, " \t\n");
         if (ws) *ws = '\0';
         // append ./ to the front of the lib playerAlgorithmName
-        sprintf(playerAlgorithmName, "./%s", in_buf);
+        sprintf(playerAlgorithmName, "%s", in_buf);
         dPlayerAlgorithm = dlopen(playerAlgorithmName, RTLD_NOW);
 
         if (dPlayerAlgorithm == NULL)
@@ -36,7 +33,6 @@ bool TournamentManager::loadPlayerAlgorithms(){
 
         char *playerId;
         const char delim[] = " ._";
-
         playerId = strtok(playerAlgorithmName, delim);
         playerId = strtok(NULL, delim);
 
@@ -54,12 +50,15 @@ bool TournamentManager::loadPlayerAlgorithms(){
  * thread function
  */
  void TournamentManager::runGame(){
-    while(true) {
+   while(true) {
         theTournamentManager.tournamentMutex.lock();
         auto mapIter = theTournamentManager.gamesPlayed.begin();
         for(; mapIter->second >= MAX_GAMES_NUMBER &&
               mapIter!= theTournamentManager.gamesPlayed.end(); mapIter++);
-        if(mapIter == theTournamentManager.gamesPlayed.end()){break;}
+        if(mapIter == theTournamentManager.gamesPlayed.end()){
+			theTournamentManager.tournamentMutex.unlock();
+			break;
+		}
 
         string player1_id = mapIter->first;
         theTournamentManager.gamesPlayed[player1_id]++;
@@ -87,16 +86,19 @@ bool TournamentManager::loadPlayerAlgorithms(){
             theTournamentManager.gamesPlayed[player2_id]++;
         }
         else{
-            int player2_ID_index = rand() % finishedIDs.size();
-            player2_id = finishedIDs[player2_ID_index];
+			if((int)finishedIDs.size() != 0){
+				int player2_ID_index = rand() % finishedIDs.size();
+				player2_id = finishedIDs[player2_ID_index];
+				theTournamentManager.gamesPlayed[player2_id]++;
+			}
         }
         theTournamentManager.tournamentMutex.unlock();
-
         GameManager gameManager(theTournamentManager.factory[player1_id](), theTournamentManager.factory[player2_id]());
         gameManager.initGame();
         gameManager.positioningStage();
         if (!gameManager.getGameStatus().isGameOn()) {
             theTournamentManager.updateScores(player1_id, player2_id, gameManager, player2NotFinished);
+			continue;
         }
         gameManager.moveStage();
         theTournamentManager.updateScores(player1_id, player2_id, gameManager, player2NotFinished);
@@ -136,7 +138,7 @@ void TournamentManager::runTournament(){
         gameThreads[i].join();
     }
     printTournamentResults();
-    cleanup();
+    //cleanup();
 }
 
 void TournamentManager::cleanup(){

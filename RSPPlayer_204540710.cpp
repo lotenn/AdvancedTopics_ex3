@@ -2,13 +2,12 @@
 #include "AlgorithmRegistration.h"
 
 //*******************************************Auto Algorithm*****************************************************
-extern "C" {
 RSPPlayer_204540710::RSPPlayer_204540710(){
     resetKnownBoard();
 }
-}
 
-REGISTER_ALGORITHM(204540710)
+
+//REGISTER_ALGORITHM(204540710)
 
 bool PossiblePieces::canMove(){
     return getPossiblePiece() == pROCK || getPossiblePiece() == pSCISSORS || getPossiblePiece() == pPAPER;

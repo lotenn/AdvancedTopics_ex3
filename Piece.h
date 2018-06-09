@@ -68,7 +68,7 @@ public:
             joker(_joker),
             isPositioned(false){}
 
-    virtual ~Piece() = default;
+    virtual ~Piece() {}
 
     pieceType getType() const {return this->type;}
 
