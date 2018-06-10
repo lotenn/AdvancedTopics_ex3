@@ -14,11 +14,10 @@
 using namespace std;
 
 #define BUF_SIZE 1024
-#define PATH_MAX_SIZE 4096
+//#define PATH_MAX_SIZE 4096
 #define DEFAULT_NUM_OF_THREADS 4
 #define DEFAULT_PATH "./"
-//todo: max to 30
-#define MAX_GAMES_NUMBER 100
+#define MAX_GAMES_NUMBER 30
 
 class TournamentManager {
 private:
@@ -42,8 +41,8 @@ public:
             factory[id] = factoryMethod;
             scores[id] = 0;
         }
-        else{
-            //todo: error msg
+        else{   //id tried to register twice
+            cout << "id: " << id << " tried to register more than once" << endl;
         }
     }
     bool loadPlayerAlgorithms();

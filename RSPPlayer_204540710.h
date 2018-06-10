@@ -79,8 +79,7 @@ public:
     vector<pieceType> getKnownWeakerPieces(pieceType playerPiece) const;
     possiblePieceType getJokerRepStrongerThan(const possiblePieceType &threatType) const;
 	
-	//todo 
-	void printKnownBoard();
+//	void printKnownBoard();
 
 };
 

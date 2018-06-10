@@ -130,7 +130,6 @@ void TournamentManager::runTournament(){
     }
 	if((int)factory.size() <= 1){
 		cout << "Not enough players for tournament" << endl;
-		//todo: reutrn cleanup
 		cleanup();
 		return;
 	}

@@ -223,7 +223,6 @@ void RSPPlayer_204540710::notifyFightResult(const FightInfo& fightInfo){
         }
         else {    //secondary contains losing piece
             knownBoard[row][col][PRIMARY].setOptFlag(false);
-			//todo: 
 			knownBoard[row][col][PRIMARY].setPossiblePiece(charToPossiblePieceType(opponentPiece));
             knownBoard[row][col][SECONDARY].reset();
         }
@@ -236,9 +235,6 @@ void RSPPlayer_204540710::notifyFightResult(const FightInfo& fightInfo){
 }
 
 unique_ptr<Move> RSPPlayer_204540710::getMove(){
-	//todo:
-	printKnownBoard();
-
     //possible move of all this->player pieces
     int numOfMobilePieces = 0;
     vector<PointImp> possibleTargets[N][M];
@@ -328,16 +324,8 @@ unique_ptr<Move> RSPPlayer_204540710::getMove(){
             }
         }
     }
-
     //randomly choose a mobile piece
     std::srand(std::time(nullptr));
-	
-	//todo:
-    if(numOfMobilePieces == 0){
-		cout << "numOfMobilePieces :" << numOfMobilePieces << endl;
-		printKnownBoard();
-	}
-	
 	int randPieceNumber = rand() % numOfMobilePieces;
     for(int i=0; i<N; i++) {
         for (int j = 0; j < M; j++) {
@@ -454,12 +442,6 @@ unique_ptr<JokerChange> RSPPlayer_204540710::getJokerChange(){
                         if(threatPlayer == getOpposite(this->player)&& threatType != pUNKNOWN) {
                             possiblePieceType newJokerRep = getJokerRepStrongerThan(threatType);
                             possibleJokerPiece->setPossiblePiece(newJokerRep);
-							
-							//todo:
-							cout << "threatType is: " << possiblePieceTypeToChar(threatType) << endl;
-							cout << "new joker rep :" << possiblePieceTypeToChar(newJokerRep) << endl;
-							
-							
 							return move(make_unique<JokerChangeImp>(jokerPosition.getX(),
                                                                     jokerPosition.getY(),
                                                                     possiblePieceTypeToChar(newJokerRep)));
@@ -485,18 +467,17 @@ possiblePieceType RSPPlayer_204540710::getJokerRepStrongerThan(const possiblePie
     }
 }
 
-//todo
-void RSPPlayer_204540710::printKnownBoard(){
-    string str;
-    for (int row = 0; row < N; row++) {
-        for (int col = 0; col < M; col++){
-			char pChar = possiblePieceTypeToChar(knownBoard[row][col][PRIMARY].getPossiblePiece());
-            str += (knownBoard[row][col][PRIMARY].getPlayer() == PLAYER_2 ? tolower(pChar) : pChar);
-			str+= " ";
-        }
-        if(row != N-1)
-            str+="\n";
-    }
-    cout << str << endl;
-}
+//void RSPPlayer_204540710::printKnownBoard(){
+//    string str;
+//    for (int row = 0; row < N; row++) {
+//        for (int col = 0; col < M; col++){
+//			char pChar = possiblePieceTypeToChar(knownBoard[row][col][PRIMARY].getPossiblePiece());
+//            str += (knownBoard[row][col][PRIMARY].getPlayer() == PLAYER_2 ? tolower(pChar) : pChar);
+//			str+= " ";
+//        }
+//        if(row != N-1)
+//            str+="\n";
+//    }
+//    cout << str << endl;
+//}
 

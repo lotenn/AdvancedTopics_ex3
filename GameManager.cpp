@@ -223,12 +223,17 @@ void GameManager::setPlayerPieces(const vector<unique_ptr<PiecePosition>> &piece
                 if(!piece->IsPositioned() && !piece->isJoker() && piece->getType() == _pieceType){
                     wasFight = performBattle(piecePositions[i]->getPosition(), piece,
                                              board.getPiece(piecePositions[i]->getPosition()));
-                    if(wasFight)
+                    if(wasFight){
+                        playerEnum winner;
+                        if(fightInfo.getWinner() == 1){winner = PLAYER_1;}
+                        else if(fightInfo.getWinner() == 2){winner = PLAYER_2;}
+                        else{winner = NO_PLAYER;}
                         fights.push_back(move(make_unique<FightInfoImp>(piecePositions[i]->getPosition(),
-                                                                   fightInfo.getPiece(1),
-                                                                   fightInfo.getPiece(2),
-                                                                   fightInfo.getWinner() == 1 ? PLAYER_1 : PLAYER_2)));
-                break;
+                                                                        fightInfo.getPiece(1),
+                                                                        fightInfo.getPiece(2),
+                                                                        winner)));
+                    }
+                    break;
                 }
             }
         }
@@ -240,17 +245,23 @@ void GameManager::setPlayerPieces(const vector<unique_ptr<PiecePosition>> &piece
                     piece-> placePiece();
                     wasFight = performBattle(piecePositions[i]->getPosition(), piece,
                                              board.getPiece(piecePositions[i]->getPosition()));
-                    if(wasFight)
+                    if(wasFight){
+                        playerEnum winner;
+                        if(fightInfo.getWinner() == 1){winner = PLAYER_1;}
+                        else if(fightInfo.getWinner() == 2){winner = PLAYER_2;}
+                        else{winner = NO_PLAYER;}
                         fights.push_back(move(make_unique<FightInfoImp>(piecePositions[i]->getPosition(),
-                                                                   fightInfo.getPiece(1),
-                                                                   fightInfo.getPiece(2),
-                                                                   fightInfo.getWinner() == 1 ? PLAYER_1 : PLAYER_2)));
-                break;
+                                                                        fightInfo.getPiece(1),
+                                                                        fightInfo.getPiece(2),
+                                                                        winner)));
+                    }
+                    break;
                 }
             }
         }
     }
 }
+
 
 bool GameManager::containsMovingPieces(vector<shared_ptr<Piece>>& playerPieces){
     for(shared_ptr<Piece> piece: playerPieces) {
@@ -372,11 +383,7 @@ void GameManager::moveStage(){
 
         //player 1 turn
         currentPlayer = PLAYER_1;
-		
-		//todo:
-        cout << board.boardToString() << endl;
-		cout << "********************" << endl;
-		
+
 		//player 1 lost - no more moving pieces
         if(!containsMovingPieces(player1Pieces)){
             gameStatus.setGameOff();
@@ -430,11 +437,7 @@ void GameManager::moveStage(){
 
         //player 2 turn
         currentPlayer = PLAYER_2;
-		
-		//todo:
-        cout << board.boardToString() << endl;
-		cout << "********************" << endl;
-        
+
 		//player 2 lost - no more moving pieces
         if(!containsMovingPieces(player2Pieces)){
             gameStatus.setGameOff();
