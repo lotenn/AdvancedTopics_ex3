@@ -5,8 +5,6 @@
 TournamentManager TournamentManager::theTournamentManager;
 
 bool TournamentManager::loadPlayerAlgorithms(){
-    //todo: check if there were no so files
-
     FILE *dl;   // handle to read directory
     stringstream stream_command_str;
     stream_command_str << "ls " << path << "/*.so";
@@ -42,6 +40,7 @@ bool TournamentManager::loadPlayerAlgorithms(){
         gamesPlayed[playerId] = 0;
         dlPlayerAlgorithms.push_back(dPlayerAlgorithm);
     }
+    pclose(dl);
     return true;
 }
 
@@ -138,7 +137,7 @@ void TournamentManager::runTournament(){
     for(int i=0; i<actual_thread_num-1; i++){
         gameThreads.push_back(thread(runGame));
     }
-    runGame();
+    runGame();  //main thread game manager
     for(int i=0; i<(int)gameThreads.size(); i++){
         gameThreads[i].join();
     }
@@ -148,7 +147,8 @@ void TournamentManager::runTournament(){
 
 void TournamentManager::cleanup(){
      factory.clear();
-     for(int i=0; i<(int)dlPlayerAlgorithms.size(); i++)
+     int numOfPlayers = (int)dlPlayerAlgorithms.size();
+     for(int i=0; i<numOfPlayers; i++)
          dlclose(dlPlayerAlgorithms[i]);
 }
 
