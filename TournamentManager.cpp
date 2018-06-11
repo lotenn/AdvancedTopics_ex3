@@ -20,13 +20,18 @@ bool TournamentManager::loadPlayerAlgorithms(){
     while(fgets(in_buf, BUF_SIZE, dl)) {
         // trim off the whitespace
         char *ws = strpbrk(in_buf, " \t\n");
-        if (ws) *ws = '\0';
+        if (ws)
+        {
+            *ws = '\0';
+        }
         // append ./ to the front of the lib playerAlgorithmName
         sprintf(playerAlgorithmName, "%s", in_buf);
         dPlayerAlgorithm = dlopen(playerAlgorithmName, RTLD_NOW);
 
-        if (dPlayerAlgorithm == NULL)
+        if (dPlayerAlgorithm == NULL){
+            pclose(dl);
             return false;
+        }
 
         char *playerId;
         const char delim[] = " ._";
@@ -125,6 +130,7 @@ void TournamentManager::updateScores(string &player1_id, string &player2_id, Gam
 void TournamentManager::runTournament(){
     if(!theTournamentManager.loadPlayerAlgorithms()){
         cout << "Error: dll load failed" << endl;
+        cleanup();
         return;
     }
 	if((int)factory.size() <= 1){
