@@ -271,25 +271,27 @@ unique_ptr<Move> RSPPlayer_204540710::getMove(){
         }
     }
     //randomly choose a mobile piece
-    std::srand(std::time(nullptr));
-	int randPieceNumber = rand() % numOfMobilePieces;
-    for(int i=0; i<N; i++) {
-        for (int j = 0; j < M; j++) {
-            if (!possibleTargets[i][j].empty()) {   //if the piece is mobile
-                if(randPieceNumber==0) {            //reached random piece needed
-                    int randMoveNumber = rand() % possibleTargets[i][j].size();
-                    PointImp from(j + 1, i + 1);
-                    PointImp *target = &possibleTargets[i][j][randMoveNumber];
+    if(numOfMobilePieces != 0) {
+        std::srand(std::time(nullptr));
+        int randPieceNumber = rand() % numOfMobilePieces;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < M; j++) {
+                if (!possibleTargets[i][j].empty()) {   //if the piece is mobile
+                    if (randPieceNumber == 0) {            //reached random piece needed
+                        int randMoveNumber = rand() % possibleTargets[i][j].size();
+                        PointImp from(j + 1, i + 1);
+                        PointImp *target = &possibleTargets[i][j][randMoveNumber];
 
-                    performPlayerMove(from, *target);
-                    return move(make_unique<MoveImp>(from.getX(), from.getY(), target->getX(),
-                                                     target->getY()));
+                        performPlayerMove(from, *target);
+                        return move(make_unique<MoveImp>(from.getX(), from.getY(), target->getX(),
+                                                         target->getY()));
+                    } else
+                        randPieceNumber--;
                 }
-                else
-                    randPieceNumber--;
             }
         }
     }
+    //no legal move
     return move(make_unique<MoveImp>(INVALID_COORD,INVALID_COORD,INVALID_COORD,INVALID_COORD));
 }
 
